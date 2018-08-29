@@ -18,8 +18,8 @@ Environment variables can be used in the task definition to override the default
 CLUSTER_LIST - space separated list of cluster names, or a single cluster name
 REGION - AWS region to work with
 MAXTASKS - # of tasks that can be run on your instance type
-PERCENTTHRESHOLD - percentage of ENIs consumed in the cluster before alarming (1)
-MINTHRESHOLD - minimum number of ENIs that should be availabile in the cluster
+PERCENTTHRESHOLD - percentage of ENIs consumed in the cluster before alarming
+MINTHRESHOLD - minimum number of ENIs that should be available in the cluster, useful for small clusters
 ```
 
 ## Usage
