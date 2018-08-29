@@ -15,8 +15,9 @@ put-metric-data
 Environment variables can be used in the task definition to override the defaults:
 
 ```
-CLUSTER_LIST REGION
-MAXTASKS
+CLUSTER_LIST - space separated list of cluster names, or a single cluster name
+REGION - AWS region to work with
+MAXTASKS - # of tasks that can be run on your instance type
 PERCENTTHRESHOLD - percentage of ENIs consumed in the cluster before alarming (1)
 MINTHRESHOLD - minimum number of ENIs that should be availabile in the cluster
 ```
@@ -32,3 +33,7 @@ MINTHRESHOLD - minimum number of ENIs that should be availabile in the cluster
 * Monitor the CloudWatch log stream and the metrics for the new 'ECSENI' namespace
 * Configure alarms based on the 0 (OK), or (1) ALARM value
 * Add to your ASGs for each cluster as a scaling policy
+
+### Limitations
+
+The current script has a limit of 100 container instances per cluster as it is using a single describe-container-instances call, it could be modified to workaround this.
