@@ -19,4 +19,16 @@ CLUSTER_LIST REGION
 MAXTASKS
 PERCENTTHRESHOLD - percentage of ENIs consumed in the cluster before alarming (1)
 MINTHRESHOLD - minimum number of ENIs that should be availabile in the cluster
-``` 
+```
+
+## Usage
+
+* Build the Docker container
+
+`docker build -t ecs-eni-scaling .`
+
+* Push to your registry
+* Configure a task definition with the image, environment variables, task role, and CloudWatch logs
+* Monitor the CloudWatch log stream and the metrics for the new 'ECSENI' namespace
+* Configure alarms based on the 0 (OK), or (1) ALARM value
+* Add to your ASGs for each cluster as a scaling policy
