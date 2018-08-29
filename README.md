@@ -2,7 +2,7 @@
 
 A shell script that can be run as a task in an ECS Cluster to push a metric to CloudWatch when a breach in the number of remaining, or percentage of used ENIs are met for your ECS Cluster(s). This is particularly useful when running tasks with awsvpc network mode.
 
-The script sends a metric of 0 (OK), or (1) ALARM, the metric can then be configured in an alarm to contribute to your ASG scaling policy.
+The script sends a metric of 0 (OK), or 1 (ALARM), the metric can then be configured in an alarm to contribute to your ASG scaling policy.
 
 Ideally run as a single ECS replica service, a task role is recommended to provide IAM credentials needed for the following API calls via the AWS CLI:
 
@@ -31,7 +31,7 @@ MINTHRESHOLD - minimum number of ENIs that should be availabile in the cluster
 * Push to your registry
 * Configure a task definition with the image, environment variables, task role, and CloudWatch logs
 * Monitor the CloudWatch log stream and the metrics for the new 'ECSENI' namespace
-* Configure alarms based on the 0 (OK), or (1) ALARM value
+* Configure alarms based on the 0 (OK), or 1 (ALARM) value
 * Add to your ASGs for each cluster as a scaling policy
 
 ### Limitations
