@@ -38,3 +38,4 @@ MINTHRESHOLD - minimum number of ENIs that should be available in the cluster, u
 
 * The current script has a limit of 100 container instances per cluster as it is using a single describe-container-instances call, it could be modified to workaround this.
 * Ideal usage is for a single ASG and Cluster, although the metric/alarm can be used in a scaling policy for multiple multiple ASGs.
+* The MAXTASKS is a fixed ENI amount used in the calculations, if you are using varying instance types with different ENI limits this may not work for you as desired.
