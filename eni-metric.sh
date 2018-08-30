@@ -67,7 +67,7 @@ while true
               then
                 # Alarm
                 _VALUE=1
-                echo "`date +%FT%TZ` Sending alarm (1) to $_CWNAMESPACE/$_CLUSTER-$_CWMETRICSUFFIX for a breach of the percentage ($_PERCENTUSED/$_PERCENTTHRESHOLD) of used, or number ($_REMAINING/$_CLUSTERMAX) of remaining ENIs in the cluster."
+                echo "`date +%FT%TZ` Sending alarm (1) to $_CWNAMESPACE/$_CLUSTER-$_CWMETRICSUFFIX for a breach of percentage used ($_PERCENTUSED/$_PERCENTTHRESHOLD), or available ($_REMAINING/$_MINTHRESHOLD) ENIs in the cluster."
               else
                 _VALUE=0
             fi
