@@ -1,17 +1,19 @@
 #!/bin/sh
 
 ### Cluster information - overide with environment variables or use defaults
-### Override: CLUSTER_LIST, REGION, MAXTASKS, PERCENTTHRESHOLD, MINTHRESHOLD
+### Override: CLUSTER_LIST, REGION, MAXTASKS, PERCENT_USED_THRESHOLD, MIN_AVAIL_THRESHOLD
 _CLUSTER_LIST=${CLUSTER_LIST:-default}
 _REGION=${REGION:-us-east-1}
 ### Number of awsvpc tasks that the cluster instance type can launch, used to form the percentage and # of interfaces available
 _MAXTASKS=${MAXTASKS:-2}
 ### % threshold of interface attachments consumed in the cluster to alarm on
-_PERCENTTHRESHOLD=${PERCENTTHRESHOLD:-85}
+_PERCENT_USED_THRESHOLD=${PERCENT_USED_THRESHOLD:-85}
 ### min # of interface attachments available to alarm on
-_MINTHRESHOLD=${MINTHRESHOLD:-1}
+_MIN_AVAIL_THRESHOLD=${MIN_AVAIL_THRESHOLD:-1}
 ### CloudWatch metric name
-_CWMETRICSUFFIX=eni-breach
+_CWMETRICSUFFIX_USED=eni-breach-used
+_CWMETRICSUFFIX_AVAILABLE=eni-breach-available
+_CWMETRICSUFFIX_PERCENTUSED=eni-percent-used
 _CWNAMESPACE=ECSENI
 ### Polling frequency (seconds)
 _SLEEP=60
@@ -63,17 +65,27 @@ while true
             _PERCENTUSED=$(echo "scale=1; $_ATTACHMENTCOUNT / $_CLUSTERMAX * 100" | bc -l | cut -d. -f1)
             _REMAINING=$(echo "$_CLUSTERMAX - $_ATTACHMENTCOUNT" | bc)
 
-            if [[ $_PERCENTUSED -ge $_PERCENTTHRESHOLD || $_REMAINING -le $_MINTHRESHOLD ]]
+            if [ $_PERCENTUSED -ge $_PERCENT_USED_THRESHOLD ]
               then
                 # Alarm
-                _VALUE=1
-                echo "`date +%FT%TZ` Sending alarm (1) to $_CWNAMESPACE/$_CLUSTER-$_CWMETRICSUFFIX for a breach of percentage used ($_PERCENTUSED/$_PERCENTTHRESHOLD), or available ($_REMAINING/$_MINTHRESHOLD) ENIs in the cluster."
+                _USED=1
+                echo "`date +%FT%TZ` Sending alarm (1) to $_CWNAMESPACE/$_CLUSTER-$_CWMETRICSUFFIX_USED for a breach of percentage used ($_PERCENTUSED/$_PERCENT_USED_THRESHOLD) ENIs in the cluster."
               else
-                _VALUE=0
+                _USED=0
+            fi
+            if [ $_REMAINING -le $_MIN_AVAIL_THRESHOLD ]
+              then
+                # Alarm
+                _AVAILABLE=1
+                echo "`date +%FT%TZ` Sending alarm (1) to $_CWNAMESPACE/$_CLUSTER-$_CWMETRICSUFFIX_AVAILABLE for a breach of # available ($_REMAINING/$_MIN_AVAIL_THRESHOLD) ENIs in the cluster."
+              else
+                _AVAILABLE=0
             fi
 
             ## Send the metric
-            aws cloudwatch put-metric-data --metric-name $_CLUSTER-$_CWMETRICSUFFIX --namespace $_CWNAMESPACE --value $_VALUE --region $_REGION --unit Count --timestamp `date +%FT%TZ`
+            aws cloudwatch put-metric-data --metric-name $_CLUSTER-$_CWMETRICSUFFIX_USED --namespace $_CWNAMESPACE --value $_USED --region $_REGION --unit Count --timestamp `date +%FT%TZ`
+            aws cloudwatch put-metric-data --metric-name $_CLUSTER-$_CWMETRICSUFFIX_AVAILABLE --namespace $_CWNAMESPACE --value $_AVAILABLE --region $_REGION --unit Count --timestamp `date +%FT%TZ`
+            aws cloudwatch put-metric-data --metric-name $_CLUSTER-$_CWMETRICSUFFIX_PERCENTUSED --namespace $_CWNAMESPACE --value $_PERCENTUSED --region $_REGION --unit Percent --timestamp `date +%FT%TZ`
             if [ $? -ne 0 ]
               then
                 echo "`date +%FT%TZ` there was an issue with sending the metric for $_CLUSTER-$_CWMETRICSUFFIX"
