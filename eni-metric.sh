@@ -73,7 +73,7 @@ while true
               else
                 _USED=0
             fi
-            if [ $_REMAINING -le $_MIN_AVAIL_THRESHOLD ]
+            if [ $_REMAINING -ge $_MIN_AVAIL_THRESHOLD ]
               then
                 # Alarm
                 _AVAILABLE=1
