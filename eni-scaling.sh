@@ -1,11 +1,11 @@
 #!/bin/sh
 
 ### Cluster information - overide with environment variables or use defaults
-### Override: CLUSTER_LIST, REGION, MAXTASKS, PERCENT_USED_THRESHOLD, MIN_AVAIL_THRESHOLD
+### Override: CLUSTER_LIST, REGION, MAX_TASKS, PERCENT_USED_THRESHOLD, MIN_AVAIL_THRESHOLD
 _CLUSTER_LIST=${CLUSTER_LIST:-default}
 _REGION=${REGION:-us-east-1}
 ### Number of awsvpc tasks that the cluster instance type can launch, used to form the percentage and # of interfaces available
-_MAXTASKS=${MAXTASKS:-2}
+_MAX_TASKS=${MAX_TASKS:-2}
 ### % threshold of interface attachments consumed in the cluster to alarm on
 _PERCENT_USED_THRESHOLD=${PERCENT_USED_THRESHOLD:-85}
 ### min # of interface attachments available to alarm on
@@ -35,6 +35,17 @@ if [ $? -ne 0 ]
 fi
 
 #################################
+## Trap signals to stop gracefully
+
+stop()
+  {
+    echo "Caught signal... stopping"
+    exit 0
+  }
+
+trap stop SIGTERM SIGKILL 
+
+#################################
 ## Start looping over the interval
 
 ## Create an array of the $_CLUSTER_LIST to loop
@@ -61,7 +72,7 @@ while true
         if [ $_INSTANCECOUNT -ge 1 ]
           then
             _ATTACHMENTCOUNT=$(aws ecs describe-container-instances --region $_REGION --cluster $_CLUSTER --container-instances `echo $_INSTANCES` | jq '.containerInstances[].attachments[].status' | wc -l)
-            _CLUSTERMAX=$(echo "$_MAXTASKS * $_INSTANCECOUNT" | bc)
+            _CLUSTERMAX=$(echo "$_MAX_TASKS * $_INSTANCECOUNT" | bc)
             _PERCENTUSED=$(echo "scale=1; $_ATTACHMENTCOUNT / $_CLUSTERMAX * 100" | bc -l | cut -d. -f1)
             _REMAINING=$(echo "$_CLUSTERMAX - $_ATTACHMENTCOUNT" | bc)
 

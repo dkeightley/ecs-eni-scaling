@@ -1,0 +1,39 @@
+[
+    {
+      "cpu": 0,
+      "essential": true,
+      "image": "${container_image}",
+      "memoryReservation": 64,
+      "name": "eni-scaling",
+      "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+              "awslogs-group": "${cw_log_group}",
+              "awslogs-region": "${aws_region}",
+              "awslogs-stream-prefix": "eni-scaling"
+          }
+      },
+      "environment": [
+            {
+                "name": "CLUSTER_LIST",
+                "value": "${metrics_cluster_list}"
+            },
+            {
+                "name": "REGION",
+                "value": "${aws_region}"
+            },
+            {
+                "name": "MAX_TASKS",
+                "value": "${metrics_max_tasks}"
+            },
+            {
+                "name": "PERCENT_USED_THRESHOLD",
+                "value": "${metrics_percent_threshold}"
+            },
+            {
+                "name": "MIN_AVAIL_THRESHOLD",
+                "value": "${metrics_min_number}"
+            }
+        ]
+    }
+]
