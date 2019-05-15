@@ -45,20 +45,20 @@ variable "cw_log_group" {
 
 variable "use_fargate" {
   description = "(optional) Launch Tasks on Fargate, default is to use EC2 (true/false)"
-  default     = "true"
+  default     = "false"
 }
 
 variable "fargate_security_group" {
   description = "(required if using Fargate) Security Group for use with Fargate, outbound TCP/443 is required"
-  default     = "sg-080b9857330e7e50a"
+  default     = ""
 }
 
 variable "fargate_subnets" {
   description = "(required if using Fargate) Subnets for use with Fargate, connectivity to the CloudWatch and ECS endpoints is required (can be via VPC endpoints)"
-  default     = "subnet-831866de"
+  default     = ""
 }
 
 variable "fargate_public_ip" {
   description = "(required if using Fargate) Enable Public IP - choose based on whether Private/Public Subnets and VPC endpoints are used"
-  default     = "true"
+  default     = ""
 }
